@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from rest_framework import viewsets, permissions
+from .models import PackingItem
+from .serializers import PackingItemSerializer
 
-# Create your views here.
+class PackingItemViewSet(viewsets.ModelViewSet):
+    serializer_class   = PackingItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return PackingItem.objects.filter(trip__user=self.request.user)
