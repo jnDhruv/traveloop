@@ -47,7 +47,7 @@ Data of all activities in a city
 - city_id
 - title
     
-    ### Trip_Stops
+### Trip_Stops
     
 - description
 - category - physical/accomodation/dining/landmarks
