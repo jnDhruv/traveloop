@@ -37,14 +37,69 @@ const DESTINATIONS = [
 ];
 
 const COUNTRIES = [
-  "Afghanistan","Albania","Algeria","Argentina","Australia","Austria","Bangladesh",
-  "Belgium","Brazil","Canada","Chile","China","Colombia","Croatia","Czech Republic",
-  "Denmark","Egypt","Ethiopia","Finland","France","Germany","Ghana","Greece","Hungary",
-  "India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Japan","Jordan","Kenya",
-  "Malaysia","Mexico","Morocco","Netherlands","New Zealand","Nigeria","Norway","Pakistan",
-  "Peru","Philippines","Poland","Portugal","Romania","Russia","Saudi Arabia","South Africa",
-  "South Korea","Spain","Sri Lanka","Sweden","Switzerland","Thailand","Turkey","Ukraine",
-  "United Arab Emirates","United Kingdom","United States","Vietnam","Zimbabwe",
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "Argentina",
+  "Australia",
+  "Austria",
+  "Bangladesh",
+  "Belgium",
+  "Brazil",
+  "Canada",
+  "Chile",
+  "China",
+  "Colombia",
+  "Croatia",
+  "Czech Republic",
+  "Denmark",
+  "Egypt",
+  "Ethiopia",
+  "Finland",
+  "France",
+  "Germany",
+  "Ghana",
+  "Greece",
+  "Hungary",
+  "India",
+  "Indonesia",
+  "Iran",
+  "Iraq",
+  "Ireland",
+  "Israel",
+  "Italy",
+  "Japan",
+  "Jordan",
+  "Kenya",
+  "Malaysia",
+  "Mexico",
+  "Morocco",
+  "Netherlands",
+  "New Zealand",
+  "Nigeria",
+  "Norway",
+  "Pakistan",
+  "Peru",
+  "Philippines",
+  "Poland",
+  "Portugal",
+  "Romania",
+  "Russia",
+  "Saudi Arabia",
+  "South Africa",
+  "South Korea",
+  "Spain",
+  "Sri Lanka",
+  "Sweden",
+  "Switzerland",
+  "Thailand",
+  "Turkey",
+  "Ukraine",
+  "United Arab Emirates",
+  "United Kingdom",
+  "United States",
+  "Vietnam",
+  "Zimbabwe",
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -52,7 +107,7 @@ const COUNTRIES = [
 function getPasswordStrength(pw) {
   if (!pw) return { score: 0, label: "" };
   let score = 0;
-  if (pw.length >= 8)  score++;
+  if (pw.length >= 8) score++;
   if (/[A-Z]/.test(pw)) score++;
   if (/[0-9]/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
@@ -62,35 +117,96 @@ function getPasswordStrength(pw) {
 
 function validate(fields) {
   const errors = {};
-  if (!fields.firstName.trim())            errors.firstName = "Required";
-  if (!fields.lastName.trim())             errors.lastName  = "Required";
-  if (!fields.email.trim())                errors.email     = "Required";
+  if (!fields.firstName.trim()) errors.firstName = "Required";
+  if (!fields.lastName.trim()) errors.lastName = "Required";
+  if (!fields.email.trim()) errors.email = "Required";
   else if (!/\S+@\S+\.\S+/.test(fields.email)) errors.email = "Invalid email";
-  if (!fields.phone.trim())                errors.phone     = "Required";
-  else if (!/^\+?[\d\s\-]{7,15}$/.test(fields.phone)) errors.phone = "Invalid number";
-  if (!fields.country)                     errors.country   = "Required";
-  if (!fields.city.trim())                 errors.city      = "Required";
-  if (!fields.password)                    errors.password  = "Required";
-  else if (fields.password.length < 8)     errors.password  = "Min 8 characters";
-  if (fields.password !== fields.confirm)  errors.confirm   = "Passwords don't match";
-  if (!fields.terms)                       errors.terms     = "You must agree to continue";
+  if (!fields.phone.trim()) errors.phone = "Required";
+  else if (!/^\+?[\d\s\-]{7,15}$/.test(fields.phone))
+    errors.phone = "Invalid number";
+  if (!fields.country) errors.country = "Required";
+  if (!fields.city.trim()) errors.city = "Required";
+  if (!fields.password) errors.password = "Required";
+  else if (fields.password.length < 8) errors.password = "Min 8 characters";
+  if (fields.password !== fields.confirm)
+    errors.confirm = "Passwords don't match";
+  if (!fields.terms) errors.terms = "You must agree to continue";
   return errors;
+}
+
+function Field({
+  name,
+  label,
+  icon,
+  placeholder,
+  type = "text",
+  fields,
+  touched,
+  errors,
+  handleChange,
+  handleBlur,
+}) {
+
+  const hasError = touched[name] && errors[name];
+
+  return (
+    <div className="signup-field">
+
+      <label className="signup-field__label">
+        {label}
+      </label>
+
+      <div className="signup-field__input-wrap">
+
+        <span className="signup-field__icon">
+          {icon}
+        </span>
+
+        <input
+          name={name}
+          type={type}
+          value={fields[name]}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder={placeholder}
+          autoComplete={name}
+          className={`signup-field__input${
+            hasError ? " signup-field__input--error" : ""
+          }`}
+        />
+
+      </div>
+
+      {hasError && (
+        <span className="signup-field__error">
+          {errors[name]}
+        </span>
+      )}
+
+    </div>
+  );
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function Signup({ onLogin, onSuccess }) {
-  const [destIndex, setDestIndex]   = useState(0);
-  const [animState, setAnimState]   = useState("enter"); // enter | exit
-  const [showPw, setShowPw]         = useState(false);
+  const [destIndex, setDestIndex] = useState(0);
+  const [animState, setAnimState] = useState("enter"); // enter | exit
+  const [showPw, setShowPw] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [loading, setLoading]       = useState(false);
-  const [submitted, setSubmitted]   = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const [fields, setFields] = useState({
-    firstName: "", lastName: "", email: "",
-    phone: "", country: "", city: "",
-    password: "", confirm: "", terms: false,
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    country: "",
+    city: "",
+    password: "",
+    confirm: "",
+    terms: false,
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -130,12 +246,19 @@ export function Signup({ onLogin, onSuccess }) {
     setTouched((t) => ({ ...t, [name]: true }));
     const errs = validate({ ...fields });
     if (errs[name]) setErrors((er) => ({ ...er, [name]: errs[name] }));
-    else setErrors((er) => { const n = { ...er }; delete n[name]; return n; });
+    else
+      setErrors((er) => {
+        const n = { ...er };
+        delete n[name];
+        return n;
+      });
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const allTouched = Object.fromEntries(Object.keys(fields).map((k) => [k, true]));
+    const allTouched = Object.fromEntries(
+      Object.keys(fields).map((k) => [k, true]),
+    );
     setTouched(allTouched);
     const errs = validate(fields);
     setErrors(errs);
@@ -148,36 +271,10 @@ export function Signup({ onLogin, onSuccess }) {
     setSubmitted(true);
   }
 
-  // ── Field helpers ──────────────────────────────────
-
-  function Field({ name, label, icon, placeholder, type = "text" }) {
-    const hasError = touched[name] && errors[name];
-    return (
-      <div className="signup-field">
-        <label className="signup-field__label">{label}</label>
-        <div className="signup-field__input-wrap">
-          <span className="signup-field__icon">{icon}</span>
-          <input
-            name={name}
-            type={type}
-            value={fields[name]}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder={placeholder}
-            autoComplete={name}
-            className={`signup-field__input${hasError ? " signup-field__input--error" : ""}`}
-          />
-        </div>
-        {hasError && <span className="signup-field__error">{errors[name]}</span>}
-      </div>
-    );
-  }
-
   // ── Render ─────────────────────────────────────────
 
   return (
     <div className="signup-root">
-
       {/* ── LEFT PANEL ─────────────────────────────── */}
       <aside className="signup-panel">
         <div className="signup-panel__bg" />
@@ -221,7 +318,10 @@ export function Signup({ onLogin, onSuccess }) {
                   }}
                   onClick={() => {
                     setAnimState("exit");
-                    setTimeout(() => { setDestIndex(i); setAnimState("enter"); }, 400);
+                    setTimeout(() => {
+                      setDestIndex(i);
+                      setAnimState("enter");
+                    }, 400);
                   }}
                 />
               ))}
@@ -231,14 +331,16 @@ export function Signup({ onLogin, onSuccess }) {
           {/* Testimonial */}
           <div className="signup-panel__testimonial">
             <p className="signup-panel__quote">
-              "Traveloop turned our chaotic 3-week Euro-trip into the most organised
-              adventure we've ever had."
+              "Traveloop turned our chaotic 3-week Euro-trip into the most
+              organised adventure we've ever had."
             </p>
             <div className="signup-panel__author">
               <span className="signup-panel__avatar">SR</span>
               <div>
                 <div className="signup-panel__author-name">Sara R.</div>
-                <div className="signup-panel__author-meta">Travelled to 14 countries</div>
+                <div className="signup-panel__author-meta">
+                  Travelled to 14 countries
+                </div>
               </div>
             </div>
           </div>
@@ -259,7 +361,8 @@ export function Signup({ onLogin, onSuccess }) {
               <div className="signup-success__icon">✈️</div>
               <h2 className="signup-success__title">You're on board!</h2>
               <p className="signup-success__sub">
-                Welcome to Traveloop, {fields.firstName}. Your adventure begins now.
+                Welcome to Traveloop, {fields.firstName}. Your adventure begins
+                now.
               </p>
               <button
                 className="signup-success__btn"
@@ -275,24 +378,66 @@ export function Signup({ onLogin, onSuccess }) {
               <h1 className="signup-form__title">Create your account</h1>
               <p className="signup-form__subtitle">
                 Already have one?{" "}
-                <button type="button" onClick={onLogin}>Sign in</button>
+                <button type="button" onClick={onLogin}>
+                  Sign in
+                </button>
               </p>
 
               {/* ── FORM ── */}
               <form className="signup-form" onSubmit={handleSubmit} noValidate>
-
                 {/* Name row */}
                 <div className="signup-form__row">
-                  <Field name="firstName" label="First name" icon="👤" placeholder="Ada" />
-                  <Field name="lastName"  label="Last name"  icon="👤" placeholder="Lovelace" />
+                  <Field
+                    name="firstName"
+                    label="First name"
+                    icon="👤"
+                    placeholder="Ada"
+                    fields={fields}
+                    touched={touched}
+                    errors={errors}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                  />
+                  <Field
+                    name="lastName"
+                    label="Last name"
+                    icon="👤"
+                    placeholder="Lovelace"
+                    fields={fields}
+                    touched={touched}
+                    errors={errors}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                  />
                 </div>
 
                 {/* Email */}
-                <Field name="email" label="Email" icon="✉" placeholder="ada@example.com" type="email" />
+                <Field
+                  name="email"
+                  label="Email"
+                  icon="✉"
+                  placeholder="ada@example.com"
+                  type="email"
+                  fields={fields}
+                  touched={touched}
+                  errors={errors}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                />
 
                 {/* Phone */}
-                <Field name="phone" label="Phone number" icon="📱" placeholder="+91 98765 43210" type="tel" />
-
+                <Field
+                  name="phone"
+                  label="Phone number"
+                  icon="📱"
+                  placeholder="+91 98765 43210"
+                  type="tel"
+                  fields={fields}
+                  touched={touched}
+                  errors={errors}
+                  handleChange={handleChange}
+                  handleBlur={handleBlur}
+                />
                 {/* Country & City row */}
                 <div className="signup-form__row">
                   {/* Country select */}
@@ -306,23 +451,41 @@ export function Signup({ onLogin, onSuccess }) {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         className={`signup-field__select${
-                          touched.country && errors.country ? " signup-field__input--error" : ""
+                          touched.country && errors.country
+                            ? " signup-field__input--error"
+                            : ""
                         }`}
                       >
-                        <option value="" disabled>Select…</option>
+                        <option value="" disabled>
+                          Select…
+                        </option>
                         {COUNTRIES.map((c) => (
-                          <option key={c} value={c}>{c}</option>
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
                         ))}
                       </select>
                       <span className="signup-field__chevron">▾</span>
                     </div>
                     {touched.country && errors.country && (
-                      <span className="signup-field__error">{errors.country}</span>
+                      <span className="signup-field__error">
+                        {errors.country}
+                      </span>
                     )}
                   </div>
 
                   {/* City */}
-                  <Field name="city" label="City" icon="🏙" placeholder="Mumbai" />
+                  <Field
+                    name="city"
+                    label="City"
+                    icon="🏙"
+                    placeholder="Mumbai"
+                    fields={fields}
+                    touched={touched}
+                    errors={errors}
+                    handleChange={handleChange}
+                    handleBlur={handleBlur}
+                  />
                 </div>
 
                 {/* Password */}
@@ -338,7 +501,9 @@ export function Signup({ onLogin, onSuccess }) {
                       onBlur={handleBlur}
                       placeholder="Min 8 characters"
                       className={`signup-field__input signup-field__input--with-toggle${
-                        touched.password && errors.password ? " signup-field__input--error" : ""
+                        touched.password && errors.password
+                          ? " signup-field__input--error"
+                          : ""
                       }`}
                     />
                     <button
@@ -351,7 +516,9 @@ export function Signup({ onLogin, onSuccess }) {
                     </button>
                   </div>
                   {touched.password && errors.password && (
-                    <span className="signup-field__error">{errors.password}</span>
+                    <span className="signup-field__error">
+                      {errors.password}
+                    </span>
                   )}
                   {/* Strength bar */}
                   {fields.password && (
@@ -363,12 +530,17 @@ export function Signup({ onLogin, onSuccess }) {
                               ? strength.score === 1
                                 ? "signup-strength__bar--weak"
                                 : strength.score === 2
-                                ? "signup-strength__bar--fair"
-                                : strength.score === 3
-                                ? "signup-strength__bar--good"
-                                : "signup-strength__bar--strong"
+                                  ? "signup-strength__bar--fair"
+                                  : strength.score === 3
+                                    ? "signup-strength__bar--good"
+                                    : "signup-strength__bar--strong"
                               : "";
-                          return <div key={n} className={`signup-strength__bar ${cls}`} />;
+                          return (
+                            <div
+                              key={n}
+                              className={`signup-strength__bar ${cls}`}
+                            />
+                          );
                         })}
                       </div>
                       <span className="signup-strength__label">
@@ -380,7 +552,9 @@ export function Signup({ onLogin, onSuccess }) {
 
                 {/* Confirm password */}
                 <div className="signup-field">
-                  <label className="signup-field__label">Confirm password</label>
+                  <label className="signup-field__label">
+                    Confirm password
+                  </label>
                   <div className="signup-field__input-wrap">
                     <span className="signup-field__icon">🔒</span>
                     <input
@@ -391,7 +565,9 @@ export function Signup({ onLogin, onSuccess }) {
                       onBlur={handleBlur}
                       placeholder="Repeat password"
                       className={`signup-field__input signup-field__input--with-toggle${
-                        touched.confirm && errors.confirm ? " signup-field__input--error" : ""
+                        touched.confirm && errors.confirm
+                          ? " signup-field__input--error"
+                          : ""
                       }`}
                     />
                     <button
@@ -404,7 +580,9 @@ export function Signup({ onLogin, onSuccess }) {
                     </button>
                   </div>
                   {touched.confirm && errors.confirm && (
-                    <span className="signup-field__error">{errors.confirm}</span>
+                    <span className="signup-field__error">
+                      {errors.confirm}
+                    </span>
                   )}
                 </div>
 
@@ -420,8 +598,7 @@ export function Signup({ onLogin, onSuccess }) {
                     className="signup-terms__checkbox"
                   />
                   <label htmlFor="terms" className="signup-terms__text">
-                    I agree to the{" "}
-                    <a href="#terms">Terms of Service</a> and{" "}
+                    I agree to the <a href="#terms">Terms of Service</a> and{" "}
                     <a href="#privacy">Privacy Policy</a>
                   </label>
                 </div>
@@ -463,13 +640,11 @@ export function Signup({ onLogin, onSuccess }) {
                     Facebook
                   </button>
                 </div>
-
               </form>
             </>
           )}
         </div>
       </main>
-
     </div>
   );
 }

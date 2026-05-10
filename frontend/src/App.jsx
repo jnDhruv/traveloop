@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { IntroPage } from './pages/intro/IntroPage'
 import { Signup } from './pages/signup/Signup'
+import { Login } from './pages/login/Login'
 
 function App() {
   const [page, setPage] = useState('intro')
@@ -22,16 +23,13 @@ function App() {
         />
       )
     }
-
-  // Placeholder pages — replace with real components later
-  return (
-    <div>
-      {page === 'signup' ? '→ Signup page coming soon' : '→ Login page coming soon'}
-      <button onClick={() => setPage('intro')}>
-        ← Back
-      </button>
-    </div>
-  )
+    else{
+      return (
+        <Login
+          onSuccess={() => setPage('dashboard')}
+        />
+      )
+    }
 }
 
 export default App
