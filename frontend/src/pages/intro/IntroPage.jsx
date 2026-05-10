@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./IntroPage.css";
 
 const DESTINATIONS = [
@@ -45,11 +46,12 @@ const STEPS = [
   { step: "03", title: "Travel & track",   desc: "Log costs, check off packing, share with friends." },
 ];
 
-export function IntroPage({ onGetStarted, onLogin }) {
+function IntroPage({ onGetStarted, onLogin }) {
   const [activeDestination, setActiveDestination] = useState(0);
   const [scrolled, setScrolled]                   = useState(false);
   const [visible, setVisible]                     = useState({});
   const featureRefs = useRef([]);
+  const navigate = useNavigate();
 
   // Cycle destinations every 2.8 s
   useEffect(() => {
@@ -95,10 +97,10 @@ export function IntroPage({ onGetStarted, onLogin }) {
             <span className="intro-logo__mark">T</span>raveloop
           </span>
           <div className="intro-nav__links">
-            <button className="intro-nav__link" onClick={onLogin}>
+            <button className="intro-nav__link" onClick={() => navigate("/login")}>
               Sign in
             </button>
-            <button className="btn-cta-small" onClick={onGetStarted}>
+            <button className="btn-cta-small" onClick={() => navigate("/signup")}>
               Get started
             </button>
           </div>
@@ -158,10 +160,10 @@ export function IntroPage({ onGetStarted, onLogin }) {
           </p>
 
           <div className="intro-hero__actions">
-            <button className="btn-cta-primary" onClick={onGetStarted}>
+            <button className="btn-cta-primary" onClick={() => navigate("/signup")}>
               Start planning free <span className="cta-arrow">→</span>
             </button>
-            <button className="btn-cta-ghost" onClick={onLogin}>
+            <button className="btn-cta-ghost" onClick={() => navigate("/login")}>
               I have an account
             </button>
           </div>
@@ -252,7 +254,7 @@ export function IntroPage({ onGetStarted, onLogin }) {
         <p className="intro-cta-banner__sub">
           Join thousands of travelers who plan smarter with Traveloop.
         </p>
-        <button className="btn-cta-primary" onClick={onGetStarted}>
+        <button className="btn-cta-primary" onClick={() => navigate("/signup")}>
           Create your first trip <span className="cta-arrow">→</span>
         </button>
       </section>
@@ -268,3 +270,5 @@ export function IntroPage({ onGetStarted, onLogin }) {
     </div>
   );
 }
+
+export default IntroPage;

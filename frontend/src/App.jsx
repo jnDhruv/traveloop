@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import { IntroPage } from './pages/intro/IntroPage'
-import { Signup } from './pages/signup/Signup'
-import { Login } from './pages/login/Login'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import IntroPage from "./pages/intro/IntroPage";
+import { Login } from "./pages/login/Login";
+import { Signup } from "./pages/signup/Signup";
 
 function App() {
-  const [page, setPage] = useState('intro')
 
-  if (page === 'intro') {
-    return (
-      <IntroPage
-        onGetStarted={() => setPage('signup')}
-        onLogin={() => setPage('login')}
-      />
-    )
-  }
+  return (
 
-  if (page === 'signup') {
-      return (
-        <Signup
-          onLogin={() => setPage('login')}
-          onSuccess={() => setPage('dashboard')}
+    <BrowserRouter>
+
+      <Routes>
+
+        <Route
+          path="/"
+          element={<IntroPage />}
         />
-      )
-    }
-    else{
-      return (
-        <Login
-          onSuccess={() => setPage('dashboard')}
+
+        <Route
+          path="/login"
+          element={<Login />}
         />
-      )
-    }
+
+        <Route
+          path="/signup"
+          element={<Signup />}
+        />
+
+      </Routes>
+
+    </BrowserRouter>
+
+  );
 }
 
-export default App
+export default App;

@@ -1,39 +1,41 @@
 import { useState } from "react";
+import { loginUser } from "../../api/auth";
 import "./Login.css";
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
 const TRIP_CARDS = [
-  { emoji: "🏔️", city: "Manali, India",      badge: "5 days · Dec 2025" },
-  { emoji: "🌊", city: "Bali, Indonesia",     badge: "10 days · Mar 2026" },
-  { emoji: "🏛️", city: "Rome, Italy",         badge: "7 days · Jun 2026" },
+  { emoji: "🏔️", city: "Manali, India", badge: "5 days · Dec 2025" },
+  { emoji: "🌊", city: "Bali, Indonesia", badge: "10 days · Mar 2026" },
+  { emoji: "🏛️", city: "Rome, Italy", badge: "7 days · Jun 2026" },
 ];
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function validate(fields) {
   const errors = {};
-  if (!fields.email.trim())
-    errors.email = "Email is required";
+  if (!fields.email.trim()) errors.email = "Email is required";
   else if (!/\S+@\S+\.\S+/.test(fields.email))
     errors.email = "Enter a valid email";
-  if (!fields.password)
-    errors.password = "Password is required";
-  else if (fields.password.length < 6)
-    errors.password = "Min 6 characters";
+  if (!fields.password) errors.password = "Password is required";
+  else if (fields.password.length < 6) errors.password = "Min 6 characters";
   return errors;
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
 export function Login({ onSignup, onSuccess }) {
-  const [fields, setFields]   = useState({ email: "", password: "", remember: false });
-  const [errors, setErrors]   = useState({});
+  const [fields, setFields] = useState({
+    email: "",
+    password: "",
+    remember: false,
+  });
+  const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [showPw, setShowPw]   = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [shake, setShake]     = useState(false);
+  const [shake, setShake] = useState(false);
 
   // ── Handlers ────────────────────────────────────────
 
@@ -41,7 +43,10 @@ export function Login({ onSignup, onSuccess }) {
     const { name, value, type, checked } = e.target;
     setFields((f) => ({ ...f, [name]: type === "checkbox" ? checked : value }));
     if (touched[name]) {
-      const errs = validate({ ...fields, [name]: type === "checkbox" ? checked : value });
+      const errs = validate({
+        ...fields,
+        [name]: type === "checkbox" ? checked : value,
+      });
       setErrors((er) => ({ ...er, [name]: errs[name] }));
     }
   }
@@ -55,28 +60,60 @@ export function Login({ onSignup, onSuccess }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setTouched({ email: true, password: true });
-    const errs = validate(fields);
-    setErrors(errs);
 
-    if (Object.keys(errs).length > 0) {
-      // Shake the card on error
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
-      return;
+    const newErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
     }
 
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    setLoggedIn(true);
-  }
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    }
 
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        email,
+        password,
+      };
+
+      const data = await loginUser(payload);
+
+      console.log("LOGIN SUCCESS:", data);
+
+      // Save tokens
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
+
+      setSuccess(true);
+
+      setTimeout(() => {
+        if (onSuccess) {
+          onSuccess();
+        }
+      }, 1200);
+    } catch (error) {
+      console.error(error);
+
+      if (error.response?.status === 401) {
+        alert("Invalid email or password");
+      } else {
+        alert("Login failed");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
   // ── Render ──────────────────────────────────────────
 
   return (
     <div className="login-root">
-
       {/* ── LEFT PANEL ───────────────────────────────── */}
       <aside className="login-panel">
         <div className="login-panel__dots" />
@@ -84,7 +121,6 @@ export function Login({ onSignup, onSuccess }) {
         <div className="login-panel__glow2" />
 
         <div className="login-panel__content">
-
           {/* Logo */}
           <span className="login-panel__logo">
             <span className="login-panel__logo-mark">T</span>raveloop
@@ -96,7 +132,8 @@ export function Login({ onSignup, onSuccess }) {
               ✦ &nbsp;Welcome back, explorer
             </div>
             <h1 className="login-panel__title">
-              Your trips are<br />
+              Your trips are
+              <br />
               <em>waiting for you.</em>
             </h1>
             <p className="login-panel__body">
@@ -143,17 +180,17 @@ export function Login({ onSignup, onSuccess }) {
               <div className="login-panel__avatar">AK</div>
               <div>
                 <div className="login-panel__author-name">Arjun K.</div>
-                <div className="login-panel__author-meta">Solo traveller · 22 countries</div>
+                <div className="login-panel__author-meta">
+                  Solo traveller · 22 countries
+                </div>
               </div>
             </div>
           </div>
-
         </div>
       </aside>
 
       {/* ── RIGHT — FORM SIDE ─────────────────────────── */}
       <main className="login-form-side">
-
         {/* Mobile logo */}
         <div className="login-mobile-logo">
           <span className="login-mobile-logo__mark">T</span>raveloop
@@ -169,7 +206,6 @@ export function Login({ onSignup, onSuccess }) {
           }
         >
           {loggedIn ? (
-
             /* ── SUCCESS ── */
             <div className="login-success">
               <div className="login-success__icon">🗺️</div>
@@ -184,9 +220,7 @@ export function Login({ onSignup, onSuccess }) {
                 Go to dashboard →
               </button>
             </div>
-
           ) : (
-
             <>
               {/* ── HEADER ── */}
               <div className="login-form__eyebrow">✦ Sign in</div>
@@ -200,7 +234,6 @@ export function Login({ onSignup, onSuccess }) {
 
               {/* ── FORM ── */}
               <form className="login-form" onSubmit={handleSubmit} noValidate>
-
                 {/* Email */}
                 <div className="login-field">
                   <label className="login-field__label">Email</label>
@@ -215,7 +248,9 @@ export function Login({ onSignup, onSuccess }) {
                       placeholder="you@example.com"
                       autoComplete="email"
                       className={`login-field__input${
-                        touched.email && errors.email ? " login-field__input--error" : ""
+                        touched.email && errors.email
+                          ? " login-field__input--error"
+                          : ""
                       }`}
                     />
                   </div>
@@ -238,7 +273,9 @@ export function Login({ onSignup, onSuccess }) {
                       placeholder="Your password"
                       autoComplete="current-password"
                       className={`login-field__input login-field__input--padded${
-                        touched.password && errors.password ? " login-field__input--error" : ""
+                        touched.password && errors.password
+                          ? " login-field__input--error"
+                          : ""
                       }`}
                     />
                     <button
@@ -251,7 +288,9 @@ export function Login({ onSignup, onSuccess }) {
                     </button>
                   </div>
                   {touched.password && errors.password && (
-                    <span className="login-field__error">{errors.password}</span>
+                    <span className="login-field__error">
+                      {errors.password}
+                    </span>
                   )}
                 </div>
 
@@ -298,15 +337,18 @@ export function Login({ onSignup, onSuccess }) {
                 {/* Social */}
                 <div className="login-socials">
                   <button type="button" className="login-social-btn">
-                    <span className="login-social-btn__icon login-social-btn__icon--g">G</span>
+                    <span className="login-social-btn__icon login-social-btn__icon--g">
+                      G
+                    </span>
                     Google
                   </button>
                   <button type="button" className="login-social-btn">
-                    <span className="login-social-btn__icon login-social-btn__icon--f">f</span>
+                    <span className="login-social-btn__icon login-social-btn__icon--f">
+                      f
+                    </span>
                     Facebook
                   </button>
                 </div>
-
               </form>
             </>
           )}
@@ -319,7 +361,6 @@ export function Login({ onSignup, onSuccess }) {
             </p>
           )}
         </div>
-
       </main>
 
       {/* Shake keyframe injected inline so it's self-contained */}
@@ -333,7 +374,6 @@ export function Login({ onSignup, onSuccess }) {
           75%      { transform: translateX(-2px); }
         }
       `}</style>
-
     </div>
   );
 }

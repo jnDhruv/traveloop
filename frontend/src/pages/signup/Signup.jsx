@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { registerUser } from "../../api/auth";
 import "./Signup.css";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -255,21 +256,57 @@ export function Signup({ onLogin, onSuccess }) {
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    const allTouched = Object.fromEntries(
-      Object.keys(fields).map((k) => [k, true]),
-    );
-    setTouched(allTouched);
-    const errs = validate(fields);
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+
+  e.preventDefault();
+
+  const allTouched = Object.fromEntries(
+    Object.keys(fields).map((k) => [k, true])
+  );
+
+  setTouched(allTouched);
+
+  const errs = validate(fields);
+
+  setErrors(errs);
+
+  if (Object.keys(errs).length > 0) return;
+
+  try {
 
     setLoading(true);
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1600));
-    setLoading(false);
+
+    const payload = {
+      email: fields.email,
+      password: fields.password,
+      first_name: fields.firstName,
+      last_name: fields.lastName,
+      phone_number: fields.phone,
+      city: fields.city,
+      country: fields.country,
+    };
+
+    const data = await registerUser(payload);
+
+    console.log("REGISTER SUCCESS:", data);
+
     setSubmitted(true);
+
+  } catch (error) {
+
+    console.error(error);
+
+    if (error.response?.data) {
+      console.log(error.response.data);
+    }
+
+    alert("Registration failed");
+
+  } finally {
+
+    setLoading(false);
+
   }
+}
 
   // ── Render ─────────────────────────────────────────
 
